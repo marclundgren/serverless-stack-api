@@ -1,25 +1,21 @@
 # NOTE: update this with your service name
 service: free-notes-app-api
 
-# Create an optimized package for our functions
+# Create an optimized package for our functions 
 package:
   individually: true
 
 plugins:
   - serverless-bundle # Package our functions with Webpack
   - serverless-offline
-  - serverless-dotenv-plugin # Load .env as environment variables
+  - serverless-dotenv-plugin
 
 provider:
   name: aws
   runtime: nodejs12.x
   stage: prod
   region: us-east-2
-  # To load environment variables externally
-  # rename env.example to .env and uncomment
-  # the following line. Also, make sure to not
-  # commit your .env.
-  #
+
   environment:
     tableName: notes
     stripeSecretKey: ${env:STRIPE_SECRET_KEY}
@@ -29,7 +25,8 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:DescribeTable - dynamodb:Query
+        - dynamodb:DescribeTable
+        - dynamodb:Query
         - dynamodb:Scan
         - dynamodb:GetItem
         - dynamodb:PutItem
@@ -38,77 +35,87 @@ provider:
       Resource: "arn:aws:dynamodb:us-east-2:*:*"
 
 functions:
+  # Defines an HTTP API endpoint that calls the main function in create.js
+  # - path: url path is /interviews
+  # - method: POST request
+  # - cors: enabled CORS (Cross-Origin Resource Sharing) for browser cross
+  #     domain api call
+  # - authorizer: authenticate using the AWS IAM role
   create:
-    # Defines an HTTP API endpoint that calls the main function in create.js
-    # - path: url path in /notes
-    # - method: POST request
-    # - cors: enabled CORS (Cross-Origin Resource Sharing) for browser cross
-    # domain api call
-    # - authorizer: authenticate using the AWS IAM role
     handler: create.main
     events:
       - http:
-        path: notes
-        method: post
-        cors: true
-        authorizer: aws_iam
+          path: interviews
+          method: post
+          cors: true
+          authorizer: aws_iam
+
   get:
     # Defines an HTTP API endpoint that calls the main function in get.js
-    # - path: url path is /notes/{id}
+    # - path: url path is /interviews/{id}
     # - method: GET request
     handler: get.main
     events:
       - http:
-        path: notes/{id}
-        method: get
-        cors: true
-        authorizer: aws_iam
+          path: interviews/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
+
   list:
     # Defines an HTTP API endpoint that calls the main function in list.js
-    # - path: url path is /notes
+    # - path: url path is /interviews
     # - method: GET request
     handler: list.main
     events:
       - http:
-        path: notes
-        method: get
-        cors: true
-        authorizer: aws_iam
+          path: interviews
+          method: get
+          cors: true
+          authorizer: aws_iam
+  
   update:
     # Defines an HTTP API endpoint that calls the main function in update.js
-    # - path: url path is /notes
-    # - method: GET request
+    # - path: url path is /notes/{id}
+    # - method: PUT request
     handler: update.main
     events:
       - http:
-        path: notes/{id}
-        method: put
-        cors: true
-        authorizer: aws_iam
+          path: interviews/{id}
+          method: put
+          cors: true
+          authorizer: aws_iam
+  
   delete:
     # Defines an HTTP API endpoint that calls the main function in delete.js
-    # - path: url path is /notes
-    # - method: GET request
+    # - path: url path is /notes/{id}
+    # - method: DELETE request
     handler: delete.main
     events:
       - http:
-        path: notes/{id}
-        method: delete
-        cors: true
-        authorizer: aws_iam
-  billing:
-    # Defines an HTTP API endpoint that calls the main function in billing.js
-    # - method: POST request
-    # - path: url path is /billing
-    handler: billing.main
-    events:
-      - http:
-        path: billing
-        method: post
-        cors: true
-        authorizer: aws_iam
-
+          path: interviews/{id}
+          method: delete
+          cors: true
+          authorizer: aws_iam
 # Create our resources with separate CloudFormation templates
+
 resources:
-  # API Gateway Errors
-  - ${file(resources/api-gateway-errors.yml)}
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+    GatewayResponseDefault5XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
