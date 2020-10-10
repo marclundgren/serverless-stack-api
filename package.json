@@ -1,16 +1,12 @@
 {
   "name": "serverless-stack-api",
-  "version": "2.2.0",
+  "version": "0.0.1",
   "description": "A free notes app",
   "scripts": {
     "test": "jest",
-    "deploy": "serverless deploy",
-    "run:script:create": "serverless invoke local --function create --path mocks/create-event.json",
-    "run:script:get": "serverless invoke local --function get --path mocks/get-event.json",
-    "run:script:list": "serverless invoke local --function list --path mocks/list-event.json",
-    "run:script:update": "serverless invoke local --function update --path mocks/update-event.json",
-    "run:script:delete": "serverless invoke local --function delete --path mocks/delete-event.json",
-    "run:script:billing": "serverless invoke local --function billing --path mocks/billing-event.json"
+    "api-test": "./scripts/test-apis.sh",
+    "mock-test": "./scripts/test-mocks.sh",
+    "deploy": "serverless deploy"
   },
   "author": "",
   "license": "MIT",
