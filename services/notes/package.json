@@ -6,7 +6,7 @@
     "test": "jest",
     "api-test": "./scripts/test-apis.sh",
     "mock-test": "./scripts/test-mocks.sh",
-    "deploy": "serverless deploy"
+    "deploy": "serverless deploy --stage dev"
   },
   "author": "",
   "license": "MIT",
