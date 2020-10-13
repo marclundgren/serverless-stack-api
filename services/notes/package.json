@@ -5,8 +5,7 @@
   "scripts": {
     "test": "jest",
     "api-test": "./scripts/test-apis.sh",
-    "mock-test": "./scripts/test-mocks.sh",
-    "deploy": "serverless deploy --stage dev"
+    "mock-test": "./scripts/test-mocks.sh"
   },
   "author": "",
   "license": "MIT",
